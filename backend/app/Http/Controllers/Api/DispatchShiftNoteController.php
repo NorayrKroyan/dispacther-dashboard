@@ -33,21 +33,17 @@ class DispatchShiftNoteController extends Controller
         ]);
 
         $note = DB::transaction(function () use ($idJoin, $data) {
-            $existing = DispatchShiftNote::query()
+            DispatchShiftNote::query()
                 ->where('id_join', $idJoin)
                 ->where('shift_key', $data['shift_key'])
                 ->where('started_by_name', $data['started_by_name'])
                 ->where('is_active', true)
-                ->latest('id')
-                ->first();
-
-            if ($existing) {
-                $existing->update([
-                    'note_text' => $data['note_text'] ?? '',
+                ->update([
+                    'is_active' => false,
+                    'ended_by_user_id' => $data['started_by_user_id'] ?? null,
+                    'ended_by_name' => $data['started_by_name'],
+                    'ended_at' => now(),
                 ]);
-
-                return $existing->fresh();
-            }
 
             return DispatchShiftNote::query()->create([
                 'id_join' => $idJoin,
