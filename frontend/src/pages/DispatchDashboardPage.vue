@@ -1,15 +1,17 @@
 <template>
   <div class="app">
-    <div class="title">Yoder-LaSalle Personnel List</div>
+    <div class="title">{{ pageTitle }}</div>
 
     <JobSelectorBar
-      :jobs="jobs"
-      :selected-join-id="selectedJoinId"
-      :dispatcher-name="dispatcherName"
-      :shift-key="shiftKey"
-      @change-job="changeJob"
-      @update:dispatcher-name="dispatcherName = $event"
-      @update:shift-key="shiftKey = $event"
+        :jobs="jobs"
+        :selected-join-id="selectedJoinId"
+        :dispatcher-name="dispatcherName"
+        :shift-key="shiftKey"
+        :search-text="searchText"
+        @change-job="changeJob"
+        @update:dispatcher-name="dispatcherName = $event"
+        @update:shift-key="shiftKey = $event"
+        @update:search-text="searchText = $event"
     />
 
     <div v-if="errorMessage || flashMessage" class="feedback-bar">
@@ -20,21 +22,22 @@
     <div class="viewport">
       <div class="canvas">
         <DriverRosterTable
-          :rows="rows"
-          :dispatcher-name="dispatcherName"
-          :statuses="statuses"
-          :events="events"
-          @save-state="handleSaveState"
-          @save-note="handleSaveNote"
-          @message="handleMessage"
-          @call="handleCall"
+            :rows="rows"
+            :dispatcher-name="dispatcherName"
+            :statuses="statuses"
+            :events="events"
+            :search-text="searchText"
+            @save-state="handleSaveState"
+            @save-note="handleSaveNote"
+            @message="handleMessage"
+            @call="handleCall"
         />
 
         <ShiftJournalPanel
-          :notes="shiftNotes"
-          :dispatcher-name="dispatcherName"
-          :shift-key="shiftKey"
-          @save-active="handleSaveActiveShiftNote"
+            :notes="shiftNotes"
+            :dispatcher-name="dispatcherName"
+            :shift-key="shiftKey"
+            @save-active="handleSaveActiveShiftNote"
         />
       </div>
     </div>
@@ -58,6 +61,7 @@ const jobs = ref([])
 const selectedJoinId = ref(null)
 const dispatcherName = ref('Miguel')
 const shiftKey = ref('DAY')
+const searchText = ref('')
 const rows = ref([])
 const shiftNotes = ref([])
 const job = ref(null)
@@ -67,7 +71,7 @@ const errorMessage = ref('')
 const statuses = ['ON DUTY', 'OFF DUTY', 'BREAKDOWN', 'DAYS OFF']
 const events = ['', 'Enter Job Site', 'Exit Job Site', 'Enter Pull Point', 'Exit Pull Point']
 
-const jobName = computed(() => job.value?.job_name || '')
+const pageTitle = computed(() => job.value?.job_name || 'Yoder-LaSalle Personnel List')
 
 onMounted(async () => {
   await loadJobs()
