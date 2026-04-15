@@ -59,22 +59,42 @@ textarea {
 .job-selector-bar {
   width: 1252px;
   margin: 0 0 10px 14px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: 948px 288px;
+  column-gap: 16px;
+  align-items: end;
 }
 
-.job-selector-left,
+.job-selector-left {
+  width: 948px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.left-controls,
+.left-search,
 .job-selector-right {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+}
+
+.left-search {
+  flex: 0 0 auto;
+}
+
+.job-selector-right {
+  width: 288px;
+  justify-content: flex-start;
 }
 
 .field-label {
   font-size: 12px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .field-input {
@@ -87,8 +107,24 @@ textarea {
   font-size: 12px;
 }
 
+.job-field {
+  width: 210px;
+  min-width: 210px;
+}
+
+.search-field {
+  width: 200px;
+  min-width: 200px;
+}
+
+.dispatcher-field {
+  width: 140px;
+  min-width: 140px;
+}
+
 .small-field {
-  min-width: 88px;
+  width: 84px;
+  min-width: 84px;
 }
 
 .feedback-bar {
@@ -108,7 +144,7 @@ textarea {
 .canvas {
   width: 1468px;
   display: grid;
-  grid-template-columns: 940px 512px;
+  grid-template-columns: 948px 504px;
   gap: 16px;
   align-items: start;
   transform: scale(0.8529);
@@ -120,26 +156,8 @@ textarea {
   min-width: 0;
 }
 
-.toolbar {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-bottom: 6px;
-  min-height: 28px;
-}
-
-.search {
-  width: 190px;
-  height: 24px;
-  padding: 0 8px;
-  font-size: 12px;
-  border: 1px solid #999;
-  border-radius: 2px;
-  background: #fff;
-}
-
 .personnel-table {
-  width: 100%;
+  width: 948px;
   border-collapse: collapse;
   table-layout: fixed;
   background: #fff;
@@ -221,6 +239,7 @@ textarea {
 .driver-notes-cell {
   background: var(--cell-white) !important;
   padding: 0 !important;
+  overflow: hidden;
 }
 
 .driver-notes-input {
@@ -233,6 +252,7 @@ textarea {
   font-size: 12px;
   color: #111;
   padding: 0 6px;
+  display: block;
 }
 
 .driver-notes-input:focus {
@@ -381,7 +401,7 @@ textarea {
 
 .journal-card {
   display: grid;
-  grid-template-columns: 1fr 110px;
+  grid-template-columns: 1fr 92px;
 }
 
 .journal-editor {
@@ -417,35 +437,31 @@ textarea {
 .note-body {
   flex: 1 1 auto;
   min-height: 0;
+  padding: 6px;
 }
 
 .note-textarea {
   width: 100%;
-  height: 100%;
-  min-height: 96px;
   border: 0;
   outline: none;
   resize: none;
   background: transparent;
   font-size: 12px;
   line-height: 1.25;
-  padding: 6px;
+  padding: 0;
 }
 
-.note-readonly {
-  min-height: 96px;
-  padding: 6px;
-  font-size: 12px;
-  line-height: 1.25;
-  white-space: pre-wrap;
+.compact-textarea {
+  height: 66px;
+  min-height: 66px;
 }
 
-.journal-meta {
+.journal-actions {
   border: 2px solid var(--grid-border);
   border-left: 1px solid var(--grid-border);
   background: #f4f4f4;
   display: grid;
-  grid-template-rows: 22px 22px 28px 30px 30px 28px 30px;
+  grid-template-rows: 22px 22px 1fr;
 }
 
 .meta-button {
@@ -458,38 +474,85 @@ textarea {
   cursor: pointer;
 }
 
-.meta-button[disabled] {
-  cursor: not-allowed;
-  opacity: 0.75;
-}
-
-.meta-blank {
-  border-bottom: 1px solid var(--grid-border);
-}
-
-.meta-label,
-.meta-value {
+.meta-button + .meta-button {
   border-top: 1px solid var(--grid-border);
-  padding: 4px 6px;
-  font-size: 12px;
+}
+
+.journal-actions-fill {
+  border-top: 1px solid var(--grid-border);
   background: #ececec;
-}
-
-.meta-label {
-  text-align: center;
-}
-
-.meta-value.time {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  text-align: right;
 }
 
 .small-note {
   margin-top: 8px;
   font-size: 11px;
   color: #556;
+}
+
+.history-shell {
+  margin-top: 8px;
+}
+
+.history-shell-right {
+  width: 504px;
+}
+
+.history-title {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  background: #fff;
+}
+
+.history-table th,
+.history-table td {
+  border: 1px solid var(--grid-border);
+  padding: 0 6px;
+  height: 22px;
+  font-size: 11px;
+  line-height: 1;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-table th {
+  height: 24px;
+  text-align: left;
+  background: var(--header-orange);
+  font-weight: 700;
+}
+
+.history-note-col {
+  width: 48%;
+}
+
+.history-dispatcher-col {
+  width: 18%;
+}
+
+.history-created-col {
+  width: 24%;
+}
+
+.history-shift-col {
+  width: 10%;
+}
+
+.history-note-cell {
+  background: var(--cell-white) !important;
+}
+
+.empty-row {
+  text-align: center;
+  background: var(--cell-white) !important;
 }
 
 .section-gap-row td {
