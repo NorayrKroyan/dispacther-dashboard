@@ -28,7 +28,9 @@ class DispatchDriverStateController extends Controller
             'history_note' => ['nullable', 'string'],
         ]);
 
-        DB::transaction(function () use ($data) {
+        $hasLastEvent = array_key_exists('last_event', $data);
+
+        DB::transaction(function () use ($data, $hasLastEvent) {
             $current = DispatchDriverCurrentState::query()
                 ->where('id_driver', $data['id_driver'])
                 ->where('id_join', $data['id_join'])
@@ -37,13 +39,15 @@ class DispatchDriverStateController extends Controller
             $startedAt = $data['state_started_at'] ?? now();
 
             if (!$current) {
+                $lastEventForWrite = $hasLastEvent ? ($data['last_event'] ?? '') : '';
+
                 DispatchDriverCurrentState::query()->create([
                     'id_driver' => $data['id_driver'],
                     'id_join' => $data['id_join'],
                     'current_status' => $data['current_status'],
                     'state_started_at' => $startedAt,
                     'predicted_return_at' => $data['predicted_return_at'] ?? null,
-                    'last_event' => $data['last_event'] ?? '',
+                    'last_event' => $lastEventForWrite,
                     'updated_by_user_id' => $data['updated_by_user_id'] ?? null,
                     'updated_by_name' => $data['updated_by_name'] ?? null,
                 ]);
@@ -54,7 +58,7 @@ class DispatchDriverStateController extends Controller
                     'status' => $data['current_status'],
                     'started_at' => $startedAt,
                     'predicted_return_at' => $data['predicted_return_at'] ?? null,
-                    'last_event' => $data['last_event'] ?? '',
+                    'last_event' => $lastEventForWrite,
                     'changed_by_user_id' => $data['updated_by_user_id'] ?? null,
                     'changed_by_name' => $data['updated_by_name'] ?? null,
                     'note' => $data['history_note'] ?? null,
@@ -64,6 +68,7 @@ class DispatchDriverStateController extends Controller
             }
 
             $statusChanged = $current->current_status !== $data['current_status'];
+            $lastEventForWrite = $hasLastEvent ? ($data['last_event'] ?? '') : ($current->last_event ?? '');
 
             if ($statusChanged) {
                 DispatchDriverStateHistory::query()
@@ -80,7 +85,7 @@ class DispatchDriverStateController extends Controller
                     'status' => $data['current_status'],
                     'started_at' => $startedAt,
                     'predicted_return_at' => $data['predicted_return_at'] ?? null,
-                    'last_event' => $data['last_event'] ?? '',
+                    'last_event' => $lastEventForWrite,
                     'changed_by_user_id' => $data['updated_by_user_id'] ?? null,
                     'changed_by_name' => $data['updated_by_name'] ?? null,
                     'note' => $data['history_note'] ?? null,
@@ -94,24 +99,34 @@ class DispatchDriverStateController extends Controller
                     ->first();
 
                 if ($openHistory) {
-                    $openHistory->update([
+                    $historyUpdate = [
                         'predicted_return_at' => $data['predicted_return_at'] ?? null,
-                        'last_event' => $data['last_event'] ?? '',
                         'changed_by_user_id' => $data['updated_by_user_id'] ?? null,
                         'changed_by_name' => $data['updated_by_name'] ?? null,
                         'note' => $data['history_note'] ?? $openHistory->note,
-                    ]);
+                    ];
+
+                    if ($hasLastEvent) {
+                        $historyUpdate['last_event'] = $lastEventForWrite;
+                    }
+
+                    $openHistory->update($historyUpdate);
                 }
             }
 
-            $current->update([
+            $currentUpdate = [
                 'current_status' => $data['current_status'],
                 'state_started_at' => $statusChanged ? $startedAt : $current->state_started_at,
                 'predicted_return_at' => $data['predicted_return_at'] ?? null,
-                'last_event' => $data['last_event'] ?? '',
                 'updated_by_user_id' => $data['updated_by_user_id'] ?? null,
                 'updated_by_name' => $data['updated_by_name'] ?? null,
-            ]);
+            ];
+
+            if ($hasLastEvent || $statusChanged) {
+                $currentUpdate['last_event'] = $lastEventForWrite;
+            }
+
+            $current->update($currentUpdate);
         });
 
         return response()->json([

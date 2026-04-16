@@ -116,9 +116,9 @@ class DispatchDashboardService
                     'state_started_at' => $row->state_started_at,
                     'duty_duration_label' => $duration,
                     'predicted_return_at' => $row->predicted_return_at,
-                    'last_event' => $row->tracking_last_event !== null && $row->tracking_last_event !== ''
-                        ? $row->tracking_last_event
-                        : ($row->state_last_event ?? ''),
+                    'last_event' => $row->state_last_event !== null && $row->state_last_event !== ''
+                        ? $row->state_last_event
+                        : ($row->tracking_last_event ?? ''),
                     'miles_to_job' => $row->miles_to_job,
                     'eta_to_deliver_minutes' => $row->eta_to_deliver_minutes,
                     'gps_recorded_at' => $row->gps_recorded_at,
